@@ -1,36 +1,27 @@
 name: Azure Portfolio Deployment
 
-# Trigger on push to main branch
+# Trigger workflow on push to main branch
 on:
   push:
     branches:
       - main
-
-# Required for OIDC authentication
-permissions:
-  id-token: write
-  contents: read
 
 jobs:
   deploy-to-azure:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Azure login using OIDC / Service Principal
+      # Step 2: Azure login using client secret
       - name: Azure Login
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          # If using client secret: remove OIDC permissions and uncomment creds method
-          # creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 3: Upload files to $web container
+      # Step 3: Upload files to $web container in Azure Storage
       - name: Upload static site to Azure Storage
         run: |
           az storage blob upload-batch \
